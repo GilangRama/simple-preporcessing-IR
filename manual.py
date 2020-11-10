@@ -1,5 +1,4 @@
 import string
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 def readTxt(fileName):
     textFile = open(fileName, "r")
@@ -41,11 +40,33 @@ stopRemoval = readTxt('StopWord.txt')
 withoutStopword = [x for x in removeMultipleWord if x not in stopRemoval]
 print("Filtering Document : ",withoutStopword)
 
-factory = StemmerFactory()
-stemmer = factory.create_stemmer()
+#Manual Stemming
+kata_dasar = readTxt('kata-dasar.txt')
+akhiran = ["i", "an", "kan", "ku", "mu", "nya", "lah", "kah", "tah", "pun"]
+awalan = ["di","ke","se","me","be","pe", "te"]
+root_word = []
+for index, word in enumerate(withoutStopword):
+    #print("sesi kata ", kata)
 
-withoutStopword = ' '.join(withoutStopword) #Convert list to string
+    # cek langsung ke kata_dasar
+    if word in kata_dasar:
+        #print(kata, " = kata dasar murni")
+        root_word.append(word)
+        continue
 
-hasil = stemmer.stem(withoutStopword)
-print("Result: ", hasil)
+    # cek akhiran
+    for p in akhiran:
+        if word[-len(p):] == p and word[:-len(p)] in kata_dasar:
+            #print(kata, " = ", kata[:-len(p)], " + ", p)
+            root_word.append(word[:-len(p)])
+            break
+
+    # cek awalan
+    for x in awalan:
+        if word[:len(x)] == x and word[len(x):] in kata_dasar:
+            #print(kata, " = ",  x, " + ", kata[len(x):])
+            root_word.append(word[len(x):])
+            break
+
+print("Dokumen with stemming manual: ",root_word)
 
